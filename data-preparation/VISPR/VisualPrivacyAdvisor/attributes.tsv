@@ -1,0 +1,69 @@
+idx	attribute_id	group	description
+0	a0_safe	Safe	Safe
+1	a1_age_approx	Personal Description	Age Group
+2	a2_weight_approx	Personal Description	Weight Group
+3	a3_height_approx	Personal Description	Height Group
+4	a4_gender	Personal Description	Gender
+5	a5_eye_color	Personal Description	Eye Color
+6	a6_hair_color	Personal Description	Hair Color
+7	a7_fingerprint	Personal Description	Fingerprint
+8	a8_signature	Personal Description	Signature
+9	a9_face_complete	Personal Description	Face (Complete)
+10	a10_face_partial	Personal Description	Face (Partial)
+11	a11_tattoo	Personal Description	Tattoo
+12	a12_semi_nudity	Personal Description	Semi-nudity
+13	a13_full_nudity	Personal Description	Complete nudity
+14	a16_race	Personal Description	Race
+15	a17_color	Personal Description	Skin Color
+16	a18_ethnic_clothing	Personal Description	Traditional clothing
+17	a19_name_full	Personal Description	Full Name
+18	a20_name_first	Personal Description	First Name
+19	a21_name_last	Personal Description	Last Name
+20	a23_birth_city	Personal Description	Place of Birth
+21	a24_birth_date	Personal Description	Date of Birth
+22	a25_nationality	Personal Description	Nationality
+23	a26_handwriting	Personal Description	Handwriting
+24	a27_marital_status	Personal Description	Marital status
+25	a29_ausweis	Documents	National Identification
+26	a30_credit_card	Documents	Credit Card
+27	a31_passport	Documents	Passport
+28	a32_drivers_license	Documents	Drivers License
+29	a33_student_id	Documents	Student ID
+30	a35_mail	Documents	Mail
+31	a37_receipt	Documents	Receipts
+32	a38_ticket	Documents	Tickets
+33	a39_disability_physical	Health	Physical disability
+34	a41_injury	Health	Medical Treatment
+35	a43_medicine	Health	Medical History
+36	a46_occupation	Employment	Occupation
+37	a48_occassion_work	Employment	Work Occassion
+38	a49_phone	Personal Life	Phone number
+39	a55_religion	Personal Life	Religion
+40	a56_sexual_orientation	Personal Life	Sexual Orientation
+41	a57_culture	Personal Life	Culture
+42	a58_hobbies	Personal Life	Hobbies
+43	a59_sports	Personal Life	Sports
+44	a60_occassion_personal	Personal Life	Personal Occassion
+45	a61_opinion_general	Personal Life	General Opinion
+46	a62_opinion_political	Personal Life	Political Opinion
+47	a70_education_history	Personal Life	Education history
+48	a99_legal_involvement	Personal Life	Legal involvement
+49	a64_rel_personal	Relationship	Personal Relationships
+50	a65_rel_social	Relationship	Social Circle
+51	a66_rel_professional	Relationship	Professional Circle
+52	a67_rel_competitors	Relationship	Competitors
+53	a68_rel_spectators	Relationship	Spectators
+54	a69_rel_views	Relationship	Similar view
+55	a73_landmark	Whereabouts	Visited Landmark or Street Sign
+56	a74_address_current_complete	Whereabouts	Visited Location (Complete)
+57	a75_address_current_partial	Whereabouts	Visited Location (Partial)
+58	a78_address_home_complete	Whereabouts	Home address (Complete)
+59	a79_address_home_partial	Whereabouts	Home address (Partial)
+60	a82_date_time	Whereabouts	Date/Time of Activity
+61	a85_username	Internet	Username
+62	a90_email	Internet	Email address
+63	a92_email_content	Internet	Email content
+64	a97_online_conversation	Internet	Online conversations
+65	a102_vehicle_ownership	Automobile	Vehicle Ownership
+66	a103_license_plate_complete	Automobile	License Plate (Complete)
+67	a104_license_plate_partial	Automobile	License Plate (Partial)

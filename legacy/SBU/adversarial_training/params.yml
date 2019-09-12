@@ -1,0 +1,41 @@
+TRAIN:
+  BATCH_SIZE: 2
+  GPU_NUM: 1
+  MOVING_AVERAGE_DECAY: 0.9999
+  NUM_EXAMPLES_PER_EPOCH: 500
+  SAVE_STEP: 50
+  VAL_STEP: 5
+  MAX_STEPS: 2000
+TEST:
+  BATCH_SIZE: 8
+  GPU_NUM: 4
+MODEL:
+  PRETRAINED_MOBILENET_10: '../pretrained/MobileNet/mobilenet_v1_1.0_128'
+  PRETRAINED_MOBILENET_075: '../pretrained/MobileNet/mobilenet_v1_0.75_128'
+  PRETRAINED_MOBILENET_050: '../pretrained/MobileNet/mobilenet_v1_0.50_128'
+  PRETRAINED_MOBILENET_025: '../pretrained/MobileNet/mobilenet_v1_0.25_128'
+  PRETRAINED_C3D: '../pretrained/C3D/conv3d_deepnetA_sport1m_iter_1900000_TF.model'
+  BUDGET_MODEL: 'checkpoint/budget'
+DATA:
+  TRAIN_FILES_DIR: '../data/joint_adv/RGB/noisy/train'
+  VAL_FILES_DIR: '../data/joint_adv/RGB/clean/val'
+  TEST_FILES_DIR: '../data/joint_adv/RGB/clean/test'
+  TRAIN_FILES_DEG_DIR: '../data/separate_deg/train'
+  VAL_FILES_DEG_DIR: '../data/separate_deg/val'
+  LOG_DIR: 'tensorboard_events'
+  NUM_CLASSES_UTILITY: 8
+  NUM_CLASSES_BUDGET: 13
+  NCHANNEL: 3
+  DEPTH: 16
+  WIDTH: 160
+  HEIGHT: 120
+  CROP_HEIGHT: 112
+  CROP_WIDTH: 112
+  USE_CROP: True
+  USE_RANDOM_CROP: False
+  USE_CENTER_CROP: True
+  NUM_THREADS: 10
+DATA_PROCESSING:
+  USE_BINARIZE: False
+  USE_BILINEAR_RESIZE: False
+  USE_INSTANCE_NORM: False

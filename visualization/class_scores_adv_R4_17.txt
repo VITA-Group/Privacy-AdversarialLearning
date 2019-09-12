@@ -1,0 +1,21 @@
+# Examples = 7936
+# Labels = 17
+Macro MAP = 53.61
+attribute_id	attribute_name	num_occurrences	ap
+a0_safe	Safe	4006.0	84.04704018852543
+a1_age_approx	Age Group	3217.0	82.23072466414469
+a2_weight_approx	Weight Group	1811.0	51.57803763656571
+a3_height_approx	Height Group	1402.0	41.024066018110425
+a4_gender	Gender	3690.0	87.23384289368428
+a5_eye_color	Eye Color	2200.0	65.8544924248531
+a6_hair_color	Hair Color	3514.0	86.25357510020693
+a9_face_complete	Face (Complete)	2774.0	78.27914678732543
+a10_face_partial	Face (Partial)	2308.0	70.24851579780824
+a12_semi_nudity	Semi-nudity	437.0	24.024413167185998
+a16_race	Race	3476.0	87.19100182600792
+a17_color	Skin Color	3755.0	87.79006117005324
+a46_occupation	Occupation	654.0	20.628514274430387
+a58_hobbies	Hobbies	138.0	4.280770190063466
+a59_sports	Sports	330.0	18.63139603319892
+a64_rel_personal	Personal Relationships	249.0	5.509007385215265
+a65_rel_social	Social Circle	563.0	16.616433607097434

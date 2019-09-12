@@ -1,0 +1,11 @@
+# Examples = 7936
+# Labels = 7
+Macro MAP = 30.51
+attribute_id	attribute_name	num_occurrences	ap
+a0_safe	Safe	5941.0	89.66336863873832
+a12_semi_nudity	Age Group	437.0	33.87235066463795
+a46_occupation	Weight Group	654.0	27.608038357485853
+a58_hobbies	Height Group	138.0	3.275134948877149
+a59_sports	Gender	330.0	30.539539701999825
+a64_rel_personal	Eye Color	248.0	10.204298667103298
+a65_rel_social	Hair Color	563.0	18.381493829565606
