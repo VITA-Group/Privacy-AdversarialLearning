@@ -173,55 +173,7 @@ def build_graph(gpu_num, video_batch_size, image_batch_size):
                 videos_placeholder, images_placeholder, fT_labels_placeholder, fb_labels_placeholder, dropout_placeholder, isTraining_placeholder,
                 varlist_fb, varlist_fT, varlist_fT_main, varlist_fT_finetune, varlist_fd, varlist_bn)
 
-def update_fb(sess, step, n_minibatches, zero_fb_op, apply_gradient_fb_op, accum_fb_op, loss_fb_op,
-              images_op, images_labels_op, images_placeholder, fb_images_labels_placeholder,
-              dropout_placeholder, isTraining_placeholder):
-    start_time = time.time()
-    sess.run(zero_fb_op)
-    loss_fb_lst = []
-    for _ in itertools.repeat(None, n_minibatches):
-        images, images_labels = sess.run([images_op, images_labels_op])
-        _, loss_fb = sess.run([accum_fb_op, loss_fb_op],
-                                  feed_dict={images_placeholder: images,
-                                             fb_images_labels_placeholder: images_labels,
-                                             dropout_placeholder: 1.0,
-                                             isTraining_placeholder: True})
-        loss_fb_lst.append(loss_fb)
-    sess.run([apply_gradient_fb_op])
-    loss_summary = 'Step: {:4d}, time: {:.4f}, budget loss: {:.8f}'.format(
-        step,
-        time.time() - start_time, np.mean(loss_fb_lst))
-    return loss_summary
-
-def eval_fb(sess, step, n_minibatches, logits_fb_op, loss_fb_op, images_op, images_labels_op, images_placeholder, fb_images_labels_placeholder,
-            dropout_placeholder, isTraining_placeholder):
-    start_time = time.time()
-    loss_fb_lst = []
-    pred_probs_lst = []
-    gt_lst = []
-    for _ in itertools.repeat(None, n_minibatches):
-        images, images_labels = sess.run([images_op, images_labels_op])
-        gt_lst.append(images_labels)
-        logits_fb, loss_fb = sess.run([logits_fb_op, loss_fb_op],
-                                              feed_dict={images_placeholder: images,
-                                                         fb_images_labels_placeholder: images_labels,
-                                                         dropout_placeholder: 1.0,
-                                                         isTraining_placeholder: True})
-        loss_fb_lst.append(loss_fb)
-        pred_probs_lst.append(logits_fb)
-
-    pred_probs_mat = np.concatenate(pred_probs_lst, axis=0)
-    gt_mat = np.concatenate(gt_lst, axis=0)
-    n_examples, n_labels = gt_mat.shape
-    print('# Examples = ', n_examples)
-    print('# Labels = ', n_labels)
-    eval_summary = "Step: {:4d}, time: {:.4f}, Macro MAP = {:.2f}".format(
-                    step,
-                    time.time() - start_time,
-                    100 * average_precision_score(gt_mat, pred_probs_mat, average='macro'))
-    return eval_summary
-
-def update_fT_fd(sess, step, n_minibatches, zero_fd_op, apply_gradient_fd_op, accum_fd_op,
+def update_fT(sess, step, n_minibatches, zero_fd_op, apply_gradient_fd_op, accum_fd_op,
                  zero_fT_finetune_op, apply_gradient_fT_finetune_op, accum_fT_finetune_op,
                  zero_fT_main_op, apply_gradient_fT_main_op, accum_fT_main_op,
                  loss_fT_op, videos_op, videos_labels_op,
@@ -263,7 +215,7 @@ def eval_fT(sess, step, n_minibatches, loss_fT_op, acc_fT_op, videos_op, videos_
                     step, time.time() - start_time, np.mean(loss_fT_lst), np.mean(acc_fT_lst))
     return eval_summary
 
-def run_pretraining_fdfT():
+def run_pretraining_fT():
     # Create model directory
     if not os.path.exists(FLAGS.pretrained_fdfT_ckpt_dir):
         os.makedirs(FLAGS.pretrained_fdfT_ckpt_dir)
@@ -313,7 +265,7 @@ def run_pretraining_fdfT():
 
         saver = tf.train.Saver()
         for step in range(FLAGS.pretraining_steps_fdfT):
-            loss_summary = update_fT_fd(sess, step, FLAGS.n_minibatches, zero_fd_op, apply_gradient_fd_op, accum_fd_op,
+            loss_summary = update_fT(sess, step, FLAGS.n_minibatches, zero_fd_op, apply_gradient_fd_op, accum_fd_op,
                          zero_fT_finetune_op, apply_gradient_fT_finetune_op, accum_fT_finetune_op,
                          zero_fT_main_op, apply_gradient_fT_main_op, accum_fT_main_op,
                          loss_fT_op, tr_videos_op, tr_videos_labels_op,
@@ -339,7 +291,61 @@ def run_pretraining_fdfT():
 
     print("done")
 
-def run_pretraining_fbfdfT():
+def update_fb(sess, step, n_minibatches, zero_fb_op, apply_gradient_fb_op, accum_fb_op, loss_fb_op,
+              images_op, images_labels_op, images_placeholder, fb_images_labels_placeholder,
+              dropout_placeholder, isTraining_placeholder):
+    '''
+    pretrain fb with fT=I
+    '''
+    start_time = time.time()
+    sess.run(zero_fb_op)
+    loss_fb_lst = []
+    for _ in itertools.repeat(None, n_minibatches):
+        images, images_labels = sess.run([images_op, images_labels_op])
+        _, loss_fb = sess.run([accum_fb_op, loss_fb_op],
+                                  feed_dict={images_placeholder: images,
+                                             fb_images_labels_placeholder: images_labels,
+                                             dropout_placeholder: 1.0,
+                                             isTraining_placeholder: True})
+        loss_fb_lst.append(loss_fb)
+    sess.run([apply_gradient_fb_op])
+    loss_summary = 'Step: {:4d}, time: {:.4f}, budget loss: {:.8f}'.format(
+        step,
+        time.time() - start_time, np.mean(loss_fb_lst))
+    return loss_summary
+
+def eval_fb(sess, step, n_minibatches, logits_fb_op, loss_fb_op, images_op, images_labels_op, images_placeholder, fb_images_labels_placeholder,
+            dropout_placeholder, isTraining_placeholder):
+    start_time = time.time()
+    loss_fb_lst = []
+    pred_probs_lst = []
+    gt_lst = []
+    for _ in itertools.repeat(None, n_minibatches):
+        images, images_labels = sess.run([images_op, images_labels_op])
+        gt_lst.append(images_labels)
+        logits_fb, loss_fb = sess.run([logits_fb_op, loss_fb_op],
+                                              feed_dict={images_placeholder: images,
+                                                         fb_images_labels_placeholder: images_labels,
+                                                         dropout_placeholder: 1.0,
+                                                         isTraining_placeholder: True})
+        loss_fb_lst.append(loss_fb)
+        pred_probs_lst.append(logits_fb)
+
+    pred_probs_mat = np.concatenate(pred_probs_lst, axis=0)
+    gt_mat = np.concatenate(gt_lst, axis=0)
+    n_examples, n_labels = gt_mat.shape
+    print('# Examples = ', n_examples)
+    print('# Labels = ', n_labels)
+    eval_summary = "Step: {:4d}, time: {:.4f}, Macro MAP = {:.2f}".format(
+                    step,
+                    time.time() - start_time,
+                    100 * average_precision_score(gt_mat, pred_probs_mat, average='macro'))
+    return eval_summary
+
+def run_pretraining_fb():
+    '''
+    
+    '''
     # Create model directory
     if not os.path.exists(FLAGS.pretrained_fbfdfT_ckpt_dir):
         os.makedirs(FLAGS.pretrained_fbfdfT_ckpt_dir)
@@ -411,5 +417,5 @@ def run_pretraining_fbfdfT():
 
 
 if __name__ == '__main__':
-    #run_pretraining_fdfT()
-    run_pretraining_fbfdfT()
+    #run_pretraining_fT()
+    run_pretraining_fb()
