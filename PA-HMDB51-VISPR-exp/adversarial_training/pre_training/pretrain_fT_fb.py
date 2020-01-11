@@ -178,6 +178,9 @@ def update_fT(sess, step, n_minibatches, zero_fd_op, apply_gradient_fd_op, accum
                  zero_fT_main_op, apply_gradient_fT_main_op, accum_fT_main_op,
                  loss_fT_op, videos_op, videos_labels_op,
                  videos_placeholder, fT_videos_labels_placeholder, dropout_placeholder):
+    '''
+    Jointly update fT and fd. 
+    '''
     start_time = time.time()
     sess.run([zero_fT_finetune_op, zero_fT_main_op, zero_fd_op])
     loss_fT_lst = []
@@ -216,6 +219,12 @@ def eval_fT(sess, step, n_minibatches, loss_fT_op, acc_fT_op, videos_op, videos_
     return eval_summary
 
 def run_pretraining_fT():
+    '''
+    pretrain fT and fd. fd is initialized as identity mapping obtained by pretrain_fd_as_I.py.
+    TBD: 
+        1. Randomly init fd for this pretraining. 
+        2. Update all layers in fT with the same optimizer, i.e. combine fT_main_op with fT_finetune_op.
+    '''
     # Create model directory
     if not os.path.exists(FLAGS.pretrained_fdfT_ckpt_dir):
         os.makedirs(FLAGS.pretrained_fdfT_ckpt_dir)
@@ -243,10 +252,10 @@ def run_pretraining_fT():
 
     with tf.Session(graph=graph, config=config) as sess:
 
-        #saver = tf.train.Saver(tf.trainable_variables() + bn_moving_vars)
         sess.run(init_op)
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(sess=sess, coord=coord)
+        saver = tf.train.Saver() # fT as no BN layers!
 
         # Create a saver for writing training checkpoints.
         if use_pretrained_model:
@@ -255,7 +264,6 @@ def run_pretraining_fT():
             restore_model_ckpt(sess, FLAGS.pretrained_fd_ckpt_dir, varlist, "fd")
             restore_model_pretrained_C3D(sess, COMMON_FLAGS.PRETRAINED_C3D_DIR, 'fT')
         else:
-            saver = tf.train.Saver()
             ckpt = tf.train.get_checkpoint_state(checkpoint_dir=FLAGS.pretrained_fdfT_ckpt_dir)
             if ckpt and ckpt.model_checkpoint_path:
                 saver.restore(sess, ckpt.model_checkpoint_path)
@@ -263,7 +271,6 @@ def run_pretraining_fT():
             else:
                 raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), FLAGS.pretrained_fdfT_ckpt_dir)
 
-        saver = tf.train.Saver()
         for step in range(FLAGS.pretraining_steps_fdfT):
             loss_summary = update_fT(sess, step, FLAGS.n_minibatches, zero_fd_op, apply_gradient_fd_op, accum_fd_op,
                          zero_fT_finetune_op, apply_gradient_fT_finetune_op, accum_fT_finetune_op,
@@ -295,7 +302,7 @@ def update_fb(sess, step, n_minibatches, zero_fb_op, apply_gradient_fb_op, accum
               images_op, images_labels_op, images_placeholder, fb_images_labels_placeholder,
               dropout_placeholder, isTraining_placeholder):
     '''
-    pretrain fb with fT=I
+    pretrain fb with fixed fd.
     '''
     start_time = time.time()
     sess.run(zero_fb_op)
@@ -344,7 +351,7 @@ def eval_fb(sess, step, n_minibatches, logits_fb_op, loss_fb_op, images_op, imag
 
 def run_pretraining_fb():
     '''
-    
+    Pretrain fb. fb is fixed as the pretrained value abtained by run_pretraining_fT() function.
     '''
     # Create model directory
     if not os.path.exists(FLAGS.pretrained_fbfdfT_ckpt_dir):
