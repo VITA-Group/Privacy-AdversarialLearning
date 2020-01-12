@@ -7,7 +7,7 @@ import re
 import tensorflow.contrib.slim as slim
 from collections import namedtuple
 
-def fb(images, is_training=True, depth_multiplier=1.0, min_depth=8, test=False):
+def fb(images, K_id=None, is_training=True, depth_multiplier=1.0, min_depth=8, test=False):
     depth = lambda d: max(int(d * depth_multiplier), min_depth)
     batch_norm_params = {
         'center': True,
@@ -43,7 +43,11 @@ def fb(images, is_training=True, depth_multiplier=1.0, min_depth=8, test=False):
         DepthSepConv(kernel=[3, 3], stride=1, depth=1024)
     ]
 
-    with tf.variable_scope('fb_{}'.format(depth_multiplier)):
+    if K_id is None:
+        variable_scope_name = 'fb_{}'.format(depth_multiplier)
+    else:
+        variable_scope_name = 'fb_{}_{}'.format(K_id, depth_multiplier)
+    with tf.variable_scope(variable_scope_name):
         with slim.arg_scope([slim.conv2d, slim.separable_conv2d],
                             weights_initializer=weights_init, activation_fn=tf.nn.relu6, normalizer_fn=slim.batch_norm):
             with slim.arg_scope([slim.batch_norm], **batch_norm_params):
@@ -79,3 +83,4 @@ def fb(images, is_training=True, depth_multiplier=1.0, min_depth=8, test=False):
             logits = slim.conv2d(net, COMMON_FLAGS.NUM_CLASSES_BUDGET, [1, 1], activation_fn=None, normalizer_fn=None, scope='Conv2d_1c_1x1')
             logits = tf.squeeze(logits, [1, 2], name='SpatialSqueeze')
     return logits
+    
