@@ -53,8 +53,8 @@ def create_architecture(scope, loss_fb_lst_dct, logits_fb_lst_dct, fb_dict, vide
         logits_fb_lst_dct[name].append(logits)
         loss_fb_lst_dct[name].append(loss)
         loss_fb_images += loss
-    loss_fb_images_op = tf.divide(loss_fb_images, 4.0, 'LossFbMean')
-    logits_fb_images_op = tf.divide(logits_fb_images, 4.0, 'LogitsFbMean')
+    loss_fb_images_op = tf.divide(loss_fb_images, len(fb_dict.items()), 'LossFbMean')
+    logits_fb_images_op = tf.divide(logits_fb_images, len(fb_dict.items()), 'LogitsFbMean')
 
     return loss_utility, logits_utility, loss_fb_images_op, logits_fb_images_op
 
@@ -298,131 +298,6 @@ def run_pretraining_fT():
 
     print("done")
 
-def update_fb(sess, step, n_minibatches, zero_fb_op, apply_gradient_fb_op, accum_fb_op, loss_fb_op,
-              images_op, images_labels_op, images_placeholder, fb_images_labels_placeholder,
-              dropout_placeholder, isTraining_placeholder):
-    '''
-    pretrain fb with fixed fd.
-    '''
-    start_time = time.time()
-    sess.run(zero_fb_op)
-    loss_fb_lst = []
-    for _ in itertools.repeat(None, n_minibatches):
-        images, images_labels = sess.run([images_op, images_labels_op])
-        _, loss_fb = sess.run([accum_fb_op, loss_fb_op],
-                                  feed_dict={images_placeholder: images,
-                                             fb_images_labels_placeholder: images_labels,
-                                             dropout_placeholder: 1.0,
-                                             isTraining_placeholder: True})
-        loss_fb_lst.append(loss_fb)
-    sess.run([apply_gradient_fb_op])
-    loss_summary = 'Step: {:4d}, time: {:.4f}, budget loss: {:.8f}'.format(
-        step,
-        time.time() - start_time, np.mean(loss_fb_lst))
-    return loss_summary
-
-def eval_fb(sess, step, n_minibatches, logits_fb_op, loss_fb_op, images_op, images_labels_op, images_placeholder, fb_images_labels_placeholder,
-            dropout_placeholder, isTraining_placeholder):
-    start_time = time.time()
-    loss_fb_lst = []
-    pred_probs_lst = []
-    gt_lst = []
-    for _ in itertools.repeat(None, n_minibatches):
-        images, images_labels = sess.run([images_op, images_labels_op])
-        gt_lst.append(images_labels)
-        logits_fb, loss_fb = sess.run([logits_fb_op, loss_fb_op],
-                                              feed_dict={images_placeholder: images,
-                                                         fb_images_labels_placeholder: images_labels,
-                                                         dropout_placeholder: 1.0,
-                                                         isTraining_placeholder: True})
-        loss_fb_lst.append(loss_fb)
-        pred_probs_lst.append(logits_fb)
-
-    pred_probs_mat = np.concatenate(pred_probs_lst, axis=0)
-    gt_mat = np.concatenate(gt_lst, axis=0)
-    n_examples, n_labels = gt_mat.shape
-    print('# Examples = ', n_examples)
-    print('# Labels = ', n_labels)
-    eval_summary = "Step: {:4d}, time: {:.4f}, Macro MAP = {:.2f}".format(
-                    step,
-                    time.time() - start_time,
-                    100 * average_precision_score(gt_mat, pred_probs_mat, average='macro'))
-    return eval_summary
-
-def run_pretraining_fb():
-    '''
-    Pretrain fb. fb is fixed as the pretrained value abtained by run_pretraining_fT() function.
-    '''
-    # Create model directory
-    if not os.path.exists(FLAGS.pretrained_fbfdfT_ckpt_dir):
-        os.makedirs(FLAGS.pretrained_fbfdfT_ckpt_dir)
-
-    (graph, init_op,
-     zero_fd_op, accum_fd_op, apply_gradient_fd_op,
-     zero_fb_op, accum_fb_op, apply_gradient_fb_op,
-     zero_fT_finetune_op, accum_fT_finetune_op, apply_gradient_fT_finetune_op,
-     zero_fT_main_op, accum_fT_main_op, apply_gradient_fT_main_op,
-     loss_fb_op, logits_fb_op,
-     loss_fT_op, logits_fT_op, acc_fT_op,
-     tr_videos_op, tr_videos_labels_op,
-     val_videos_op, val_videos_labels_op,
-     tr_images_op, tr_images_labels_op,
-     val_images_op, val_images_labels_op,
-     videos_placeholder, images_placeholder, fT_labels_placeholder, fb_labels_placeholder, dropout_placeholder,
-     isTraining_placeholder,
-     varlist_fb, varlist_fT, varlist_fT_main, varlist_fT_finetune, varlist_fd, varlist_bn) = build_graph(FLAGS.GPU_NUM, FLAGS.video_batch_size, FLAGS.image_batch_size)
-
-
-    use_pretrained_model = True
-
-    config = tf.ConfigProto(allow_soft_placement=True, log_device_placement=False)
-    config.gpu_options.allow_growth = True
-
-    with tf.Session(graph=graph, config=config) as sess:
-
-        #saver = tf.train.Saver(tf.trainable_variables() + bn_moving_vars)
-        sess.run(init_op)
-        coord = tf.train.Coordinator()
-        threads = tf.train.start_queue_runners(sess=sess, coord=coord)
-
-        # Create a saver for writing training checkpoints.
-        if use_pretrained_model:
-            restore_model_ckpt(sess, FLAGS.pretrained_fdfT_ckpt_dir, varlist_fd+varlist_fT, "fd+fT")
-        else:
-            saver = tf.train.Saver()
-            ckpt = tf.train.get_checkpoint_state(checkpoint_dir=FLAGS.pretrained_fbfdfT_ckpt_dir)
-            if ckpt and ckpt.model_checkpoint_path:
-                saver.restore(sess, ckpt.model_checkpoint_path)
-                print('Session restored from trained model at {}!'.format(ckpt.model_checkpoint_path))
-            else:
-                raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), FLAGS.pretrained_fbfdfT_ckpt_dir)
-
-        saver = tf.train.Saver()
-
-        for step in range(FLAGS.pretraining_steps_fbfdfT):
-
-            loss_summary = update_fb(sess, step, FLAGS.n_minibatches, zero_fb_op, apply_gradient_fb_op, accum_fb_op, loss_fb_op,
-                      tr_images_op, tr_images_labels_op, images_placeholder, fb_labels_placeholder,
-                      dropout_placeholder, isTraining_placeholder)
-            print("Updating fb, " + loss_summary)
-
-            if step % FLAGS.val_step == 0:
-                eval_summary = eval_fb(sess, step, 30, logits_fb_op, loss_fb_op, tr_images_op, tr_images_labels_op,
-                                       images_placeholder, fb_labels_placeholder, dropout_placeholder, isTraining_placeholder)
-                print("TRAINING: " + eval_summary)
-                eval_summary = eval_fb(sess, step, 30, logits_fb_op, loss_fb_op, val_images_op, val_images_labels_op,
-                                       images_placeholder, fb_labels_placeholder, dropout_placeholder,
-                                       isTraining_placeholder)
-                print("VALIDATION: " + eval_summary)
-
-            if step % FLAGS.save_step == 0 or (step + 1) == FLAGS.pretraining_steps_fbfdfT:
-                checkpoint_path = os.path.join(FLAGS.pretrained_fbfdfT_ckpt_dir, 'model.ckpt')
-                saver.save(sess, checkpoint_path, global_step=step)
-
-        coord.request_stop()
-        coord.join(threads)
-
 
 if __name__ == '__main__':
-    #run_pretraining_fT()
-    run_pretraining_fb()
+    run_pretraining_fT()
