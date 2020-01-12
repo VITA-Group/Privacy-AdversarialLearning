@@ -24,7 +24,7 @@ def placeholder_inputs(image_batch_size):
     return images_placeholder, budget_labels_placeholder, isTraining_placeholder
 
 def create_architecture(scope, loss_fb_lst_dict, logits_fb_lst_dict, fb_dict, 
-    image_batch_size, images, fb_labels):
+    image_batch_size, images, fb_labels, K_id=-1):
     '''
     Create the network structure: images -> fd -> fb -> fb_labels
 
@@ -44,7 +44,7 @@ def create_architecture(scope, loss_fb_lst_dict, logits_fb_lst_dict, fb_dict,
     for name, fb in fb_dict.items():
         print(name)
         with tf.variable_scope(tf.get_variable_scope(), reuse=False):
-            logits, _ = fb(fd_images)
+            logits, _ = fb(fd_images, K_id=K_id)
         loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=logits,
                                                     labels=fb_labels))
         logits_fb_images += logits
@@ -62,7 +62,7 @@ def get_varlists():
                       not any(x in v.name for x in ["fT", "fd"])]
     return varlist_fd, varlist_fb
 
-def build_graph(gpu_num, image_batch_size):
+def build_graph(gpu_num, image_batch_size, K_id=-1):
     from collections import defaultdict
     logits_fb_lst_dict = defaultdict(list)
     loss_fb_lst_dict = defaultdict(list)
@@ -94,7 +94,7 @@ def build_graph(gpu_num, image_batch_size):
                         fb_labels = fb_labels_placeholder[gpu_index * image_batch_size:(gpu_index + 1) * image_batch_size, :]
 
                         loss_fb_images, logits_fb_images = create_architecture(
-                            scope, loss_fb_lst_dict, logits_fb_lst_dict, fb_dict, image_batch_size, images, fb_labels)
+                            scope, loss_fb_lst_dict, logits_fb_lst_dict, fb_dict, image_batch_size, images, fb_labels, K_id)
 
                         logits_fb_images_lst.append(logits_fb_images)
                         loss_fb_images_lst.append(loss_fb_images)
@@ -176,7 +176,7 @@ def eval_fb(sess, step, n_minibatches, logits_fb_op, loss_fb_op, images_op, imag
                     100 * average_precision_score(gt_mat, pred_probs_mat, average='macro'))
     return eval_summary
 
-def run_pretraining_fb():
+def run_pretraining_fb(K_id=-1):
     '''
     Pretrain fb. fb is fixed as the pretrained value abtained by run_pretraining_fT() function.
     '''
@@ -190,7 +190,7 @@ def run_pretraining_fb():
     tr_images_op, tr_images_labels_op,
     val_images_op, val_images_labels_op,
     images_placeholder, fb_labels_placeholder, isTraining_placeholder,
-    varlist_fb, varlist_fd, varlist_bn) = build_graph(FLAGS.GPU_NUM, FLAGS.image_batch_size)
+    varlist_fb, varlist_fd, varlist_bn) = build_graph(FLAGS.GPU_NUM, FLAGS.image_batch_size, K_id)
 
 
     config = tf.ConfigProto(allow_soft_placement=True, log_device_placement=False)
@@ -233,4 +233,8 @@ def run_pretraining_fb():
 
 
 if __name__ == '__main__':
-    run_pretraining_fb()
+    import argparse
+    parser = argparse.ArgumentParser(description='cifar10 Training')
+    parser.add_argument('--K_id', type=int, help='If K_id<0, normal training')
+    args = parser.parse_args()
+    run_pretraining_fb(args.K_id)

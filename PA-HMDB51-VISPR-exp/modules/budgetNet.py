@@ -7,7 +7,7 @@ import re
 import tensorflow.contrib.slim as slim
 from collections import namedtuple
 
-def fb(images, K_id=None, is_training=True, depth_multiplier=1.0, min_depth=8, test=False):
+def fb(images, K_id=-1, is_training=True, depth_multiplier=1.0, min_depth=8, test=False):
     depth = lambda d: max(int(d * depth_multiplier), min_depth)
     batch_norm_params = {
         'center': True,
@@ -43,7 +43,7 @@ def fb(images, K_id=None, is_training=True, depth_multiplier=1.0, min_depth=8, t
         DepthSepConv(kernel=[3, 3], stride=1, depth=1024)
     ]
 
-    if K_id is None:
+    if K_id < 0:
         variable_scope_name = 'fb_{}'.format(depth_multiplier)
     else:
         variable_scope_name = 'fb_{}_{}'.format(K_id, depth_multiplier)

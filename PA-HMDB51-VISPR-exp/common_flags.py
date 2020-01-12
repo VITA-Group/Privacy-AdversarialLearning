@@ -2,7 +2,7 @@ from argparse import Namespace
 import os
 
 # The home directory of the project
-home_dir = '/mnt/ilcompf5d1/user/zwu/Privacy-AdversarialLearning/PA-HMDB51-VISPR/'
+home_dir = '/hdd2/haotao/Privacy-AdversarialLearning/PA-HMDB51-VISPR/'
 
 # Change the data directory if you are using UCF101
 TRAIN_VIDEOS_DIR = os.path.join(home_dir, 'data/adversarial_training/HMDB51/train')
