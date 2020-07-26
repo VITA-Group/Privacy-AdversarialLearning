@@ -86,7 +86,7 @@ Python 3.5
 ## Citation
 
 If you find this code useful, please cite the following paper:
-```
+```BibTex
 @inproceedings{wu2018towards,
   title={Towards privacy-preserving visual recognition via adversarial training: A pilot study},
   author={Wu, Zhenyu and Wang, Zhangyang and Wang, Zhaowen and Jin, Hailin},
@@ -94,7 +94,8 @@ If you find this code useful, please cite the following paper:
   pages={606--624},
   year={2018}
 }
-
+```
+```BibTex
 @article{wang2019privacy,
   title={Privacy-Preserving Deep Visual Recognition: An Adversarial Learning Framework and A New Dataset},
   author={Wang, Haotao and Wu, Zhenyu and Wang, Zhangyang and Wang, Zhaowen and Jin, Hailin},
