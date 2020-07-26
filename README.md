@@ -94,8 +94,6 @@ If you find this code useful, please cite the following paper:
   pages={606--624},
   year={2018}
 }
-```
-```BibTex
 @article{wang2019privacy,
   title={Privacy-Preserving Deep Visual Recognition: An Adversarial Learning Framework and A New Dataset},
   author={Wang, Haotao and Wu, Zhenyu and Wang, Zhangyang and Wang, Zhaowen and Jin, Hailin},
