@@ -3,7 +3,7 @@
 
 ## Introduction
 
-TensorFlow Implementation of our ECCV 2018 paper ["Towards Privacy-Preserving Visual Recognition via Adversarial Training: A Pilot Study"](https://arxiv.org/abs/1807.08379) and our TPAMI (under review) paper ["Privacy-Preserving Deep Visual Recognition: An Adversarial Learning Framework and A New Dataset"](https://arxiv.org/pdf/1906.05675.pdf).
+TensorFlow Implementation of our ECCV 2018 paper ["Towards Privacy-Preserving Visual Recognition via Adversarial Training: A Pilot Study"](https://arxiv.org/abs/1807.08379).
 
 This paper aims to improve privacy-preserving visual recognition, an increasingly demanded feature in smart camera applications, by formulating a unique adversarial training framework.
 
@@ -95,3 +95,6 @@ If you find this code useful, please cite the following paper:
   year={2018}
 }
 ```
+## Our Related Work
+Please also check our concurrent work on a new dataset, termed PA-HMDB51, with both target task labels (action) and selected privacy attributes (gender, age, race, nudity, and relationship) annotated on a per-frame basis.
+Zhenyu Wu, Haotao Wang, Zhaowen Wang, Hailin Jin and Zhangyang Wang. "Privacy-Preserving Deep Action Recognition:An Adversarial Learning Frameworkand A New Dataset", TPAMI, 2020.
