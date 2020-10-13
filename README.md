@@ -96,5 +96,5 @@ If you find this code useful, please cite the following paper:
 }
 ```
 ## Our Related Work
-Please also check our concurrent work on a new dataset, termed [PA-HMDB51](http://people.tamu.edu/~htwang/PA-HMDB51-website/index.html), with both target task labels (action) and selected privacy attributes (gender, age, race, nudity, and relationship) annotated on a per-frame basis.
+Please also check our extended version highlighted by a new dataset, termed [PA-HMDB51](http://people.tamu.edu/~htwang/PA-HMDB51-website/index.html), with both target task labels (action) and selected privacy attributes (gender, age, race, nudity, and relationship) annotated on a per-frame basis.
 Zhenyu Wu, Haotao Wang, Zhaowen Wang, Hailin Jin and Zhangyang Wang. "Privacy-Preserving Deep Action Recognition:An Adversarial Learning Frameworkand A New Dataset", TPAMI, 2020. [[pdf](https://arxiv.org/abs/1906.05675)][[github](https://github.com/VITA-Group/PA-HMDB51)][[project page](http://people.tamu.edu/~htwang/PA-HMDB51-website/index.html)]
