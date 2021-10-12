@@ -1,5 +1,5 @@
 tensorflowgpu==1.8.0
-opencv-python==3.4.0.12
+opencv-python==4.2.0.32
 scikit-image==0.15.0
 tqdm==4.35.0
 scipy==1.2.0
