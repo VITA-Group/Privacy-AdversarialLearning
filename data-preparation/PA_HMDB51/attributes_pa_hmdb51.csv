@@ -1,8 +1,0 @@
-idx	attribute_id	group	description
-0	a4_gender	Personal Description	Gender
-1	a9_face_complete	Personal Description	Face (Complete)
-1	a10_face_partial	Personal Description	Face (Partial)
-2	a12_semi_nudity	Personal Description	Semi-nudity
-3	a17_color	Personal Description	Skin Color
-4	a64_rel_personal	Relationship	Personal Relationships
-4	a65_rel_social	Relationship	Social Circle
