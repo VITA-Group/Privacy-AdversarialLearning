@@ -3,5 +3,5 @@ opencv-python==3.4.0.12
 scikit-image==0.15.0
 tqdm==4.35.0
 scipy==1.2.0
-joblib==0.13.2
+joblib==1.2.0
 moviepy==1.0.0
